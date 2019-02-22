@@ -1,0 +1,76 @@
+﻿@model IEnumerable<GigHub_Fundamental.Models.Gig>
+@{
+    ViewBag.Title = "Mine";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section css
+{
+<link href="~/Content/calender.css" rel="stylesheet" />
+}
+<h2>My Upcoming Gig's</h2>
+<br/>
+<ul class="gigs">
+
+    @foreach (var gig in Model)
+    {
+        <li>
+            <div class="date">
+                <div class="month">
+                    @gig.DateTime.ToString("MMM")
+                </div>
+                <div class="day">
+                    @gig.DateTime.ToString("d ")
+                </div>
+            </div>
+            <div class="details">
+                <span class="artist">
+                    @gig.Venue                 
+                </span>
+                <span class="genre">
+                    @gig.Genre.Name
+                </span>
+                <div class="actions">
+                    <a href="@Url.Action("Edit", "Gigs", new {id = gig.Id})">
+                        Edit
+                    </a> |
+                    <a href="#" class="js-cancel-gig" data-gig-id="@gig.Id">
+                        Cancel
+                    </a>
+                </div>
+
+            </div>
+
+        </li>
+    }
+</ul>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function() {
+
+            $(".js-cancel-gig").click(function (e) {
+
+                var link = $(e.target);
+
+                bootbox.confirm("Are you sure want to cancel this gig?", function(result) {
+                    $.ajax({
+                        url: "/Api/Gigss/" + link.attr("data-gig-id"),
+                        method: "DELETE"
+
+                    })
+                        .done(function () {
+                            link.parents("li").fadeOut(function () {
+                                $(this).remove();
+                            });
+                        })
+                        .fail(function () {
+                            alert("Something Failed !!");
+                        });
+                });                
+            });
+        });
+
+    </script>
+
+}
